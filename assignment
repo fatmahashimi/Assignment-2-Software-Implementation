@@ -146,88 +146,89 @@ class Tour:
 
 #Test_cases.py:
 
-# Import necessary classes from different modules
+import datetime
 from artwork import Artwork
 from exhibit_location import ExhibitionLocation
 from visitor import Visitor
 from ticket import Ticket
 from event import Event
 from tour import Tour
-import datetime
 
-# Test case to display information about an artwork
-def test_artwork_display():
-    # Create an ExhibitionLocation instance
-    location = ExhibitionLocation("001", "Mona Lisa Gallery", "Permanent gallery for Mona Lisa", "Permanent")
-    # Create an Artwork instance
-    artwork = Artwork("Mona Lisa", "Leonardo da Vinci", datetime.date(1503, 1, 1), "Renaissance masterpiece", location)
-    # Call the display_information method to print artwork details
-    artwork.display_information()
+# Test case a: Addition of new art to the museum
+def test_add_new_art():
+    # Create an exhibition location
+    permanent_gallery = ExhibitionLocation("001", "The Great Gallery", "The main gallery of the museum", "Permanent")
 
-# Test case to add and remove an artwork from an exhibition location
-def test_add_remove_artwork():
-    # Create an ExhibitionLocation instance
-    location = ExhibitionLocation("002", "Impressionist Gallery", "Gallery for Impressionist Art", "Permanent")
-    # Create an Artwork instance
-    artwork1 = Artwork("Impression, Sunrise", "Claude Monet", datetime.date(1872, 1, 1), "Impressionism", location)
-    # Add the artwork to the location
-    location.add_artwork(artwork1)
-    # Print the list of artworks in the location
-    print(location.list_artworks())
-    # Remove the artwork from the location
-    location.remove_artwork(artwork1)
-    # Print the list of artworks in the location after removal
-    print(location.list_artworks())
+    # Create an artwork
+    mona_lisa = Artwork("Mona Lisa", "Leonardo da Vinci", datetime.date(1503, 1, 1), "One of the most recognizable works of art", permanent_gallery)
 
-# Test case for registering a ticket for a visitor
-def test_visitor_ticket_registration():
-    # Create a Visitor instance
-    visitor = Visitor("V001", "John Doe", 30, "Adult")
-    # Create a Ticket instance
-    ticket1 = Ticket("T001", datetime.date.today(), datetime.date.today() + datetime.timedelta(days=30), 100, "Exhibition")
+    # Add artwork to the gallery
+    permanent_gallery.add_artwork(mona_lisa)
+
+    # Test that the artwork is now part of the gallery's collection
+    assert mona_lisa in permanent_gallery.list_artworks(), "Artwork was not added successfully."
+
+# Test case b: The opening of a new exhibition or event at the museum
+def test_open_new_exhibition():
+    # Create an exhibition location
+    exhibition_hall = ExhibitionLocation("002", "Special Exhibitions Hall", "A hall for temporary exhibitions", "ExhibitionHall")
+
+    # Create an event
+    summer_expo = Event("E001", "Summer Expo", exhibition_hall, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(days=30), 100.0)
+
+    # Test that the event is scheduled in the hall
+    assert summer_expo.location == exhibition_hall, "Event was not scheduled in the correct location."
+
+# Test case c: The purchase of tickets by an individual or tour group for an event
+def test_purchase_tickets():
+    # Create a visitor
+    visitor_john = Visitor("V001", "John Doe", 35, "Adult")
+
+    # Create an event
+    concert = Event("E002", "Concert", "Concert Hall", datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(hours=2), 150.0)
+
+    # Create a ticket for the event
+    ticket_for_concert = Ticket("T001", datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(days=1), concert.price, "SpecialEvent")
+
     # Register the ticket for the visitor
-    visitor.register(ticket1)
-    # Print the list of tickets for the visitor
-    print(visitor.list_tickets())
+    visitor_john.register(ticket_for_concert)
 
-# Test case for scheduling and canceling an event
-def test_event_scheduling_and_cancellation():
-    # Create an ExhibitionLocation instance
-    location = ExhibitionLocation("003", "Open Air Venue", "Outdoor venue for events", "Outdoor")
-    # Create an Event instance
-    event = Event("E001", "Starlight Concert", location, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(hours=2), 150)
-    # Schedule the event
-    event.schedule(location, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(hours=2))
-    # Print the event schedule details
-    print(f"Event scheduled at {event.location.name} from {event.start_time} to {event.end_time}")
-    # Cancel the event
-    event.cancel()
-    # Print a message indicating the event was cancelled
-    print("Event cancelled")
+    # Test that the ticket is now part of the visitor's tickets
+    assert ticket_for_concert in visitor_john.list_tickets(), "Ticket was not registered to the visitor."
 
-# Test case for managing a tour with visitors
-def test_tour_management():
-    # Create an ExhibitionLocation instance
-    location = ExhibitionLocation("004", "Sculpture Garden", "Outdoor space for sculpture exhibitions", "Outdoor")
-    # Create a Tour instance
-    tour = Tour("TUR001", "Alice Smith", datetime.date.today(), 20, location)
-    # Create Visitor instances
-    visitor1 = Visitor("V002", "Jane Doe", 28, "Adult")
-    visitor2 = Visitor("V003", "Bob Smith", 32, "Adult")
-    # Add visitors to the tour
-    tour.add_visitor(visitor1)
-    tour.add_visitor(visitor2)
-    # Print the list of participants in the tour
-    print(f"Tour participants: {[visitor.name for visitor in tour.participants]}")
-    # Remove a visitor from the tour
-    tour.remove_visitor(visitor1)
-    # Print the list of participants in the tour after removal
-    print(f"Tour participants after removal: {[visitor.name for visitor in tour.participants]}")
+# Test case d: The display of payment receipts for purchasing (one or more) tickets
+def test_display_payment_receipt():
+    # Create a visitor
+    visitor_anna = Visitor("V002", "Anna Smith", 28, "Adult")
 
-# Run test cases only if this module is the main program
+    # Assume visitor Anna purchases two tickets
+    tickets = [
+        Ticket("T002", datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(days=30), 50.0, "Exhibition"),
+        Ticket("T003", datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(days=30), 75.0, "Tour")
+    ]
+
+    # Register tickets to the visitor
+    for ticket in tickets:
+        visitor_anna.register(ticket)
+
+    # Calculate total cost (not including any potential discounts or additional fees for simplicity)
+    total_cost = sum(ticket.price for ticket in visitor_anna.list_tickets())
+
+    # Test that the total cost matches the sum of the ticket prices
+    assert total_cost == 125.0, "The total cost of the tickets is incorrect."
+
+    # Display the payment receipt
+    receipt = f"Payment Receipt\nVisitor: {visitor_anna.name}\nTotal Cost: {total_cost}"
+    print(receipt)
+    return receipt
+
+# Run test cases
 if __name__ == "__main__":
-    test_artwork_display()
-    test_add_remove_artwork()
-    test_visitor_ticket_registration()
-    test_event_scheduling_and_cancellation()
-    test_tour_management()
+    test_add_new_art()
+    test_open_new_exhibition()
+    test_purchase_tickets()
+    receipt = test_display_payment_receipt()
+    # Verify the receipt content
+    assert "Anna Smith" in receipt, "Receipt does not contain the correct visitor name."
+    assert "Total Cost: 125.0" in receipt, "Receipt does not display the correct total cost."
+    print("All tests passed.")
