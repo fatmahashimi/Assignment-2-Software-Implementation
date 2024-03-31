@@ -1,0 +1,233 @@
+#artwork.py:
+
+class Artwork:
+    def __init__(self, title, artist, date_of_creation, historical_significance, exhibit_location):
+        self.title = title
+        self.artist = artist
+        self.date_of_creation = date_of_creation
+        self.historical_significance = historical_significance
+        self.exhibit_location = exhibit_location
+
+    def display_information(self):
+        info = f"Title: {self.title}, Artist: {self.artist}, Date: {self.date_of_creation}, " \
+               f"Historical Significance: {self.historical_significance}, Location: {self.exhibit_location.name}"
+        print(info)
+
+    def update_location(self, new_location):
+        self.exhibit_location = new_location
+
+
+
+
+
+#exhibit_location.py:
+
+class ExhibitionLocation:
+    def __init__(self, location_id, name, description, location_type):
+        self.location_id = location_id
+        self.name = name
+        self.description = description
+        self.location_type = location_type  # This should be one of ['Permanent', 'ExhibitionHall', 'Outdoor']
+        self.artworks = []
+
+    def add_artwork(self, artwork):
+        self.artworks.append(artwork)
+
+    def remove_artwork(self, artwork):
+        self.artworks.remove(artwork)
+
+    def list_artworks(self):
+        return self.artworks
+
+
+
+
+#visitor.py:
+
+class Visitor:
+    def __init__(self, visitor_id, name, age, category):
+        self.visitor_id = visitor_id
+        self.name = name
+        self.age = age
+        self.category = category  # This should be one of ['Adult', 'Child', 'Teacher', 'Student', 'Senior']
+        self.tickets = []
+
+    def register(self, ticket):
+        self.tickets.append(ticket)
+
+    def list_tickets(self):
+        return self.tickets
+
+
+
+
+
+
+
+#ticket.py:
+
+class Ticket:
+    def __init__(self, ticket_id, date_of_issue, validity_date, price, ticket_type):
+        self.ticket_id = ticket_id
+        self.date_of_issue = date_of_issue
+        self.validity_date = validity_date
+        self.price = price
+        self.ticket_type = ticket_type  # This should be one of ['Exhibition', 'Tour', 'SpecialEvent']
+
+    def calculate_price(self, visitor):
+        # Implement pricing logic based on visitor category
+        pass
+
+    def is_valid(self):
+        # Implement validity check based on validity_date
+        pass
+
+    def assign_to_event(self, event):
+        # Assign this ticket to an event
+        pass
+
+    def assign_to_tour(self, tour):
+        # Assign this ticket to a tour
+        pass
+
+#event.py:
+
+class Event:
+    def __init__(self, event_id, name, location, start_time, end_time, price):
+        self.event_id = event_id
+        self.name = name
+        self.location = location
+        self.start_time = start_time
+        self.end_time = end_time
+        self.price = price
+        self.participants = []
+
+    def schedule(self, location, start_time, end_time):
+        self.location = location
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def cancel(self):
+        # Cancel the event
+        pass
+
+    def list_participants(self):
+        return self.participants
+
+#tour.py:
+
+class Tour:
+    def __init__(self, tour_id, guide_name, date, visitor_limit, location):
+        self.tour_id = tour_id
+        self.guide_name = guide_name
+        self.date = date
+        self.visitor_limit = visitor_limit
+        self.location = location
+        self.participants = []
+
+    def schedule(self, location, date):
+        self.location = location
+        self.date = date
+
+    def add_visitor(self, visitor):
+        if len(self.participants) < self.visitor_limit:
+            self.participants.append(visitor)
+            return True
+        return False
+
+    def remove_visitor(self, visitor):
+        if visitor in self.participants:
+            self.participants.remove(visitor)
+
+    def is_full(self):
+        return len(self.participants) >= self.visitor_limit
+
+
+
+#Test_cases.py:
+
+# Import necessary classes from different modules
+from artwork import Artwork
+from exhibit_location import ExhibitionLocation
+from visitor import Visitor
+from ticket import Ticket
+from event import Event
+from tour import Tour
+import datetime
+
+# Test case to display information about an artwork
+def test_artwork_display():
+    # Create an ExhibitionLocation instance
+    location = ExhibitionLocation("001", "Mona Lisa Gallery", "Permanent gallery for Mona Lisa", "Permanent")
+    # Create an Artwork instance
+    artwork = Artwork("Mona Lisa", "Leonardo da Vinci", datetime.date(1503, 1, 1), "Renaissance masterpiece", location)
+    # Call the display_information method to print artwork details
+    artwork.display_information()
+
+# Test case to add and remove an artwork from an exhibition location
+def test_add_remove_artwork():
+    # Create an ExhibitionLocation instance
+    location = ExhibitionLocation("002", "Impressionist Gallery", "Gallery for Impressionist Art", "Permanent")
+    # Create an Artwork instance
+    artwork1 = Artwork("Impression, Sunrise", "Claude Monet", datetime.date(1872, 1, 1), "Impressionism", location)
+    # Add the artwork to the location
+    location.add_artwork(artwork1)
+    # Print the list of artworks in the location
+    print(location.list_artworks())
+    # Remove the artwork from the location
+    location.remove_artwork(artwork1)
+    # Print the list of artworks in the location after removal
+    print(location.list_artworks())
+
+# Test case for registering a ticket for a visitor
+def test_visitor_ticket_registration():
+    # Create a Visitor instance
+    visitor = Visitor("V001", "John Doe", 30, "Adult")
+    # Create a Ticket instance
+    ticket1 = Ticket("T001", datetime.date.today(), datetime.date.today() + datetime.timedelta(days=30), 100, "Exhibition")
+    # Register the ticket for the visitor
+    visitor.register(ticket1)
+    # Print the list of tickets for the visitor
+    print(visitor.list_tickets())
+
+# Test case for scheduling and canceling an event
+def test_event_scheduling_and_cancellation():
+    # Create an ExhibitionLocation instance
+    location = ExhibitionLocation("003", "Open Air Venue", "Outdoor venue for events", "Outdoor")
+    # Create an Event instance
+    event = Event("E001", "Starlight Concert", location, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(hours=2), 150)
+    # Schedule the event
+    event.schedule(location, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(hours=2))
+    # Print the event schedule details
+    print(f"Event scheduled at {event.location.name} from {event.start_time} to {event.end_time}")
+    # Cancel the event
+    event.cancel()
+    # Print a message indicating the event was cancelled
+    print("Event cancelled")
+
+# Test case for managing a tour with visitors
+def test_tour_management():
+    # Create an ExhibitionLocation instance
+    location = ExhibitionLocation("004", "Sculpture Garden", "Outdoor space for sculpture exhibitions", "Outdoor")
+    # Create a Tour instance
+    tour = Tour("TUR001", "Alice Smith", datetime.date.today(), 20, location)
+    # Create Visitor instances
+    visitor1 = Visitor("V002", "Jane Doe", 28, "Adult")
+    visitor2 = Visitor("V003", "Bob Smith", 32, "Adult")
+    # Add visitors to the tour
+    tour.add_visitor(visitor1)
+    tour.add_visitor(visitor2)
+    # Print the list of participants in the tour
+    print(f"Tour participants: {[visitor.name for visitor in tour.participants]}")
+    # Remove a visitor from the tour
+    tour.remove_visitor(visitor1)
+    # Print the list of participants in the tour after removal
+    print(f"Tour participants after removal: {[visitor.name for visitor in tour.participants]}")
+
+# Run test cases only if this module is the main program
+if __name__ == "__main__":
+    test_artwork_display()
+    test_add_remove_artwork()
+    test_visitor_ticket_registration()
+    test_event_scheduling_and_cancellation()
+    test_tour_management()
